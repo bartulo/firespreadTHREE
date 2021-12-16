@@ -16,7 +16,7 @@ import {
   Clock,
 } from 'three';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControlsMod } from './OrbitControlsMod';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GUI } from 'dat.gui';
 
@@ -45,7 +45,7 @@ class App {
     this.gui.add( this.prueba, 'fps', 0, 60, 1 ).onChange( this.fpsUpdate.bind( this ) );
     this.gui.add( this.prueba, 'viento', 0, 2, 0.05 ).onChange( this.vientoUpdate.bind( this ) );
 
-    this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+    this.controls = new OrbitControlsMod( this.camera, this.renderer.domElement, this );
     this.controls.maxPolarAngle = Math.PI /2;
     this.controls.update();
 
@@ -53,7 +53,6 @@ class App {
     this.textureB = new WebGLRenderTarget( 256, 256 );
 
     this.terrainGeometry = new PlaneGeometry( 2, 2, 399, 399 );
-    document.addEventListener('mousedown', this.mouseClicked.bind( this ))
 
     this.clock = new Clock();
     this.delta = 0;
@@ -117,26 +116,6 @@ class App {
     this.scene.add( plane );
 
     this.animate();
-  }
-
-  mouseClicked () {
-    const mouse = new Vector2();
-    const raycaster = new Raycaster();
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    let fData = this.fireData;
-    raycaster.setFromCamera( mouse, this.camera );
-    const intersect = raycaster.intersectObjects( this.scene.children )
-
-    const fireX = parseInt( ( intersect[0].point.x + 1 ) * 255 / 2 );
-    const fireY = parseInt( ( intersect[0].point.z + 1 ) * 255 / 2 );
-    const ident = ( 256 * fireY + fireX ) * 4 + 2;
-
-    fData[ident] = 255;
-    let fDataTexture = new DataTexture( fData, 256, 256, RGBAFormat );
-    fDataTexture.flipY = true;
-
-    this.fireSpreadMaterial.uniforms.fire.value = fDataTexture;
   }
 
   fpsUpdate () {

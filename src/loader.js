@@ -10,10 +10,11 @@ import asc from './images/mdt.asc';
 import ang from './images/mdt_200_10_20m_ang.asc';
 import vel from './images/mdt_200_10_20m_vel.asc';
 
+let app = new App();
+
 class AssetsLoader {
 
   constructor () {
-    this.app = new App();
   }
 
   init () {
@@ -21,7 +22,7 @@ class AssetsLoader {
 
     let t1 = new Promise( resolve => {
       loader.load( topo, ( t ) => {
-        this.app.topoTexture = t;
+        app.topoTexture = t;
 
         resolve( );
       });
@@ -31,10 +32,10 @@ class AssetsLoader {
 
     let t2 = new Promise( resolve => {
       l.load( asc, data => {
-        this.app.mdtData = this.loadASC( data, 6 );
+        app.mdtData = this.loadASC( data, 6 );
 
         for ( let i = 0; i < 400 * 400; i++ ) {
-          this.app.terrainGeometry.attributes.position.array[ i * 3 + 2 ] = ( this.app.mdtData[ i ] / 700. ) - 2;
+          app.terrainGeometry.attributes.position.array[ i * 3 + 2 ] = ( app.mdtData[ i ] / 700. ) - 2;
         }
 
         resolve( );
@@ -51,7 +52,7 @@ class AssetsLoader {
           return f;
         });
 
-        this.app.angData = new Float32Array( e.flat() );
+        app.angData = new Float32Array( e.flat() );
 
         resolve( );
       });
@@ -67,7 +68,7 @@ class AssetsLoader {
           return f;
         });
 
-        this.app.velData = new Float32Array( e.flat() );
+        app.velData = new Float32Array( e.flat() );
 
         resolve( );
       });
@@ -81,13 +82,13 @@ class AssetsLoader {
         a[ i * 4 + 2 ] = 0;
         a[ i * 4 + 3 ] = 255;
       }
-      this.app.fireData = a;
+      app.fireData = a;
 
       resolve( );
     });
 
     Promise.all( [ t1, t2, t3, t4, t5 ] ).then( () => {
-      this.app.init();
+      app.init();
     });
 
   }
@@ -107,3 +108,4 @@ class AssetsLoader {
 }
 
 export { AssetsLoader }
+export { app }
