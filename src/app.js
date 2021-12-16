@@ -13,10 +13,12 @@ import {
   RGBAFormat,
   Vector2,
   Raycaster,
+  Clock,
 } from 'three';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { GUI } from 'dat.gui';
 
 class App {
 
@@ -34,7 +36,14 @@ class App {
     document.body.appendChild( this.renderer.domElement );
 
     this.stats = new Stats();
-    document.body.appendChild( this.stats.dom );
+    document.body.appendChild( this.stats.domElement );
+    this.gui = new GUI();
+    this.prueba = {
+      'fps': 30,
+      'viento': 0.2
+    }
+    this.gui.add( this.prueba, 'fps', 0, 60, 1 ).onChange( this.fpsUpdate.bind( this ) );
+    this.gui.add( this.prueba, 'viento', 0, 2, 0.05 ).onChange( this.vientoUpdate.bind( this ) );
 
     this.controls = new OrbitControls( this.camera, this.renderer.domElement );
     this.controls.maxPolarAngle = Math.PI /2;
@@ -45,6 +54,10 @@ class App {
 
     this.terrainGeometry = new PlaneGeometry( 2, 2, 399, 399 );
     document.addEventListener('mousedown', this.mouseClicked.bind( this ))
+
+    this.clock = new Clock();
+    this.delta = 0;
+    this.interval = 1 / 30;
   }
 
   init () {
@@ -60,14 +73,21 @@ class App {
 
     const mdtDataTexture = new DataTexture( this.mdtData, 400, 400, RedFormat, FloatType );
     const fireDataTexture = new DataTexture( this.fireData, 256, 256, RGBAFormat );
+    const angDataTexture = new DataTexture( this.angData, 100, 103, RedFormat, FloatType );
+    const velDataTexture = new DataTexture( this.velData, 100, 103, RedFormat, FloatType );
     mdtDataTexture.flipY = true;
     fireDataTexture.flipY = true;
+    angDataTexture.flipY = true;
+    velDataTexture.flipY = true;
 
     const fireSpreadGeometry = new PlaneGeometry( 256, 256 );
     this.fireSpreadMaterial = new ShaderMaterial( {
       uniforms: {
+        windfactor: { value: this.prueba.viento },
         fire: { type: 't', value: fireDataTexture },
-        mdt: { type: 't', value: mdtDataTexture }
+        mdt: { type: 't', value: mdtDataTexture },
+        ang: { type: 't', value: angDataTexture },
+        vel: { type: 't', value: velDataTexture }
       },
       vertexShader: vShader,
       fragmentShader: fShader
@@ -87,7 +107,6 @@ class App {
       uniforms: {
         fire: { type: 't', value: this.textureA.texture },
         topo: { type: 't', value: this.topoTexture },
-        dataText: { type: 't', value: mdtDataTexture }
       },
       vertexShader: terrainVShader,
       fragmentShader: terrainFShader
@@ -120,6 +139,15 @@ class App {
     this.fireSpreadMaterial.uniforms.fire.value = fDataTexture;
   }
 
+  fpsUpdate () {
+    this.interval = 1 / this.prueba.fps;
+  }
+
+  vientoUpdate () {
+    this.fireSpreadMaterial.uniforms.windfactor.value = this.prueba.viento;
+    console.log( this.prueba.viento );
+  }
+
   onWindowResize() {
 
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -132,9 +160,16 @@ class App {
   animate() {
 
     requestAnimationFrame( this.animate.bind( this ) );
-    this.controls.update();
     this.stats.update();
-    this.render();
+
+    this.renderer.setRenderTarget( null );
+    this.renderer.render( this.scene, this.camera );
+
+    this.delta += this.clock.getDelta();
+    if ( this.delta > this.interval ) {
+      this.render();
+      this.delta = this.delta % this.interval;
+    }
 
   }
 
@@ -142,8 +177,6 @@ class App {
 
     this.renderer.setRenderTarget( this.textureB );
     this.renderer.render( this.fireSpreadScene, this.orthoCamera );
-    this.renderer.setRenderTarget( null );
-    this.renderer.render( this.scene, this.camera );
 
     let temp = this.textureA;
     this.textureA = this.textureB;
