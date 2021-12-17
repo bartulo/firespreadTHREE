@@ -40,10 +40,12 @@ class App {
     this.gui = new GUI();
     this.prueba = {
       'fps': 30,
-      'viento': 0.2
+      'viento': 0.2,
+      'direccion': 0
     }
     this.gui.add( this.prueba, 'fps', 0, 60, 1 ).onChange( this.fpsUpdate.bind( this ) );
     this.gui.add( this.prueba, 'viento', 0, 2, 0.05 ).onChange( this.vientoUpdate.bind( this ) );
+    this.gui.add( this.prueba, 'direccion', 0, 316, 45 ).onChange( this.direccionUpdate.bind( this ) );
 
     this.controls = new OrbitControlsMod( this.camera, this.renderer.domElement, this );
     this.controls.maxPolarAngle = Math.PI /2;
@@ -72,12 +74,24 @@ class App {
 
     const mdtDataTexture = new DataTexture( this.mdtData, 400, 400, RedFormat, FloatType );
     const fireDataTexture = new DataTexture( this.fireData, 256, 256, RGBAFormat );
-    const angDataTexture = new DataTexture( this.angData, 100, 103, RedFormat, FloatType );
-    const velDataTexture = new DataTexture( this.velData, 100, 103, RedFormat, FloatType );
+    this.angDataTexture = []
+    this.velDataTexture = []
+    this.angData.forEach( value => {
+      let b = new DataTexture( value, 100, 103, RedFormat, FloatType );
+      this.angDataTexture.push( b );
+    });
+    this.velData.forEach( value => {
+      let b = new DataTexture( value, 100, 103, RedFormat, FloatType );
+      this.velDataTexture.push( b );
+    });
     mdtDataTexture.flipY = true;
     fireDataTexture.flipY = true;
-    angDataTexture.flipY = true;
-    velDataTexture.flipY = true;
+    this.angDataTexture.forEach( value => {
+      value.flipY = true;
+    });
+    this.velDataTexture.forEach( value => {
+      value.flipY = true;
+    });
 
     const fireSpreadGeometry = new PlaneGeometry( 256, 256 );
     this.fireSpreadMaterial = new ShaderMaterial( {
@@ -85,8 +99,8 @@ class App {
         windfactor: { value: this.prueba.viento },
         fire: { type: 't', value: fireDataTexture },
         mdt: { type: 't', value: mdtDataTexture },
-        ang: { type: 't', value: angDataTexture },
-        vel: { type: 't', value: velDataTexture }
+        ang: { type: 't', value: this.angDataTexture[0] },
+        vel: { type: 't', value: this.velDataTexture[0] }
       },
       vertexShader: vShader,
       fragmentShader: fShader
@@ -124,7 +138,13 @@ class App {
 
   vientoUpdate () {
     this.fireSpreadMaterial.uniforms.windfactor.value = this.prueba.viento;
-    console.log( this.prueba.viento );
+  }
+  
+  direccionUpdate () {
+    const ind = parseInt( this.prueba.direccion ) / 45;
+    this.fireSpreadMaterial.uniforms.ang.value = this.angDataTexture[ind];
+    this.fireSpreadMaterial.uniforms.vel.value = this.velDataTexture[ind];
+    console.log( this.angData[ind] );
   }
 
   onWindowResize() {

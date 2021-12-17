@@ -53,7 +53,7 @@ void main(void)
   // La siguiente constante equivale a un if. Si hay vegetación hay fuego. Si no, no
   float cv = step( 0.1, f11.g );
   
-  float PrFire = ( f01.b * ( pendS - velY ) + f10.b * ( pendW + velX ) + f12.b * ( pendE - velX ) + f21.b * ( pendN + velY ) ) * cv - 0.1;
+  float PrFire = ( f01.b * ( pendS - velY ) + f10.b * ( pendW - velX ) + f12.b * ( pendE + velX ) + f21.b * ( pendN + velY ) ) * cv - 0.1;
   PrFire = PrFire * 0.1;
   
 
