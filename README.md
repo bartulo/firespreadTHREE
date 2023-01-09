@@ -8,7 +8,7 @@ npx webpack
 ```
 
 ## Demo
-Si prefieres puedes ver una [demo](http://94.23.199.177/predict2threejs/)
+Si prefieres puedes ver una [demo](http://94.23.199.177/firespread/)
 
 ## Instrucciones
 
