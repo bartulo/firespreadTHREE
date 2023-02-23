@@ -1,7 +1,121 @@
 <html lang="en">
   <head>
+    <link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <style>
+      * {
+        transition: all .2s ease;
+      }
+
+      .gold {
+        color: gold;
+      }
+
+      .extra-info {
+        display: none;
+        line-height: 16px;
+        font-size: 14px;
+        position: absolute;
+        top: 0;
+        left: 70px;
+      }
+
+      .info:hover .extra-info {
+        display: block;
+      }
+
+      .info {
+        position: absolute;
+        font-size: 50px;
+        left: 20px;
+        top: 60px;
+        border-radius: 15px;
+        z-index: 10;
+      }
+
+      .info:hover {
+        background-color: white;
+        padding: 0 0 0 5px;
+        width: 430px;
+        height: 150px;
+        text-align: left !important;
+      }
+
+      .loading {
+        position: absolute;
+        height:100%;
+        width: 100%;
+        background-color: gray;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        font-size: 30px;
+      }
+      .lds-ripple {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+      }
+      .lds-ripple div {
+        position: absolute;
+        border: 4px solid #fff;
+        opacity: 1;
+        border-radius: 50%;
+        animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+      }
+      .lds-ripple div:nth-child(2) {
+        animation-delay: -0.5s;
+      }
+      @keyframes lds-ripple {
+        0% {
+          top: 36px;
+          left: 36px;
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
+        4.9% {
+          top: 36px;
+          left: 36px;
+          width: 0;
+          height: 0;
+          opacity: 0;
+        }
+        5% {
+          top: 36px;
+          left: 36px;
+          width: 0;
+          height: 0;
+          opacity: 1;
+        }
+        100% {
+          top: 0px;
+          left: 0px;
+          width: 72px;
+          height: 72px;
+          opacity: 0;
+        }
+      }
+
+    </style>
   </head>
   <body>
-    
+    <div class="loading" id="spinner">
+      <div class="lds-ripple"><div><div></div></div></div>
+      <div>Cargando datos, esto puede tardar unos segundos.</div>
+    </div>
+    <div class="info">
+      <i class="icon-info-sign gold"></i>
+      <span class="extra-info">
+        <ul>
+          <li>Pulsar tecla f para iniciar un fuego en el lugar donde se encuentra el puntero</li>
+          <li>Boton izquierdo raton + arrastrar: Girar escenario</li>
+          <li>Boton derecho raton + arrastrar: Desplazar escenario</li>
+          <li>Scroll raton: Zoom in / Zoom out</li>
+        </ul>
+      </span>
+    </div>
   </body>
 </html>

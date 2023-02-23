@@ -112,6 +112,7 @@ class AssetsLoader {
     }));
 
     Promise.all( promises ).then( () => {
+      document.querySelector('#spinner').style.display = 'none';
       app.init();
     });
 
